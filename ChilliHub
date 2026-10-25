@@ -1,0 +1,147 @@
+-- ===== KEY SYSTEM =====
+local correctKey = "Null2030"
+local keyFile    = "chillihub_key.txt"
+local scriptURL  = "https://raw.githubusercontent.com/apiluarmor-hub/ChilliHub/refs/heads/main/ChilliHubV4"
+local discordURL = "https://discord.gg/TBQpdptYqH"
+
+local function runScript()
+    loadstring(game:HttpGet(scriptURL))()
+end
+
+local function hasSavedKey()
+    if isfile and isfile(keyFile) then
+        return readfile(keyFile) == correctKey
+    end
+    return false
+end
+
+local function saveKey(k)
+    if writefile then writefile(keyFile, k) end
+end
+
+-- Si ya hay key guardada, ejecuta directo
+if hasSavedKey() then
+    runScript()
+    return
+end
+
+-- ===== HUD =====
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "KeySystemHUD"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = game:GetService("CoreGui")
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 320, 0, 260)
+Frame.Position = UDim2.new(0.5, -160, 0.5, -130)
+Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+Frame.BorderSizePixel = 0
+Frame.Active = true
+Frame.Draggable = true
+Frame.Parent = ScreenGui
+Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 10)
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.Text = "🔑 ChilliHub Key System"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
+Title.Parent = Frame
+
+local Info = Instance.new("TextLabel")
+Info.Size = UDim2.new(0.9, 0, 0, 46)
+Info.Position = UDim2.new(0.05, 0, 0, 30)
+Info.BackgroundTransparency = 1
+Info.Text = "⚠️ Primero debes unirte a este Discord para obtener la key gratis.\n⚠️ First you must join this Discord to get the key for free."
+Info.TextColor3 = Color3.fromRGB(255, 220, 120)
+Info.Font = Enum.Font.Gotham
+Info.TextSize = 12
+Info.TextWrapped = true
+Info.Parent = Frame
+
+local DiscordBtn = Instance.new("TextButton")
+DiscordBtn.Size = UDim2.new(0.9, 0, 0, 30)
+DiscordBtn.Position = UDim2.new(0.05, 0, 0, 80)
+DiscordBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+DiscordBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+DiscordBtn.Text = "📋 " .. discordURL
+DiscordBtn.Font = Enum.Font.GothamBold
+DiscordBtn.TextSize = 13
+DiscordBtn.Parent = Frame
+Instance.new("UICorner", DiscordBtn).CornerRadius = UDim.new(0, 6)
+
+local CopyStatus = Instance.new("TextLabel")
+CopyStatus.Size = UDim2.new(0.9, 0, 0, 16)
+CopyStatus.Position = UDim2.new(0.05, 0, 0, 112)
+CopyStatus.BackgroundTransparency = 1
+CopyStatus.Text = ""
+CopyStatus.TextColor3 = Color3.fromRGB(90, 255, 130)
+CopyStatus.Font = Enum.Font.Gotham
+CopyStatus.TextSize = 11
+CopyStatus.Parent = Frame
+
+local TextBox = Instance.new("TextBox")
+TextBox.Size = UDim2.new(0.9, 0, 0, 32)
+TextBox.Position = UDim2.new(0.05, 0, 0, 140)
+TextBox.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextBox.PlaceholderText = "Escribe la key / Enter the key..."
+TextBox.PlaceholderColor3 = Color3.fromRGB(140, 140, 160)
+TextBox.Font = Enum.Font.Gotham
+TextBox.TextSize = 14
+TextBox.Text = ""
+TextBox.ClearTextOnFocus = false
+TextBox.Parent = Frame
+Instance.new("UICorner", TextBox).CornerRadius = UDim.new(0, 6)
+
+local Button = Instance.new("TextButton")
+Button.Size = UDim2.new(0.9, 0, 0, 32)
+Button.Position = UDim2.new(0.05, 0, 0, 178)
+Button.BackgroundColor3 = Color3.fromRGB(80, 120, 255)
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.Text = "✅ Verificar / Verify"
+Button.Font = Enum.Font.GothamBold
+Button.TextSize = 14
+Button.Parent = Frame
+Instance.new("UICorner", Button).CornerRadius = UDim.new(0, 6)
+
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1, 0, 0, 22)
+Status.Position = UDim2.new(0, 0, 1, -26)
+Status.BackgroundTransparency = 1
+Status.Text = ""
+Status.Font = Enum.Font.Gotham
+Status.TextSize = 12
+Status.Parent = Frame
+
+-- Copiar enlace al portapapeles al tocar el botón de Discord
+DiscordBtn.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(discordURL)
+        CopyStatus.TextColor3 = Color3.fromRGB(90, 255, 130)
+        CopyStatus.Text = "✅ Enlace copiado / Link copied!"
+    else
+        CopyStatus.TextColor3 = Color3.fromRGB(255, 200, 90)
+        CopyStatus.Text = "Copia manualmente: " .. discordURL
+    end
+    task.wait(2)
+    CopyStatus.Text = ""
+end)
+
+Button.MouseButton1Click:Connect(function()
+    if TextBox.Text == correctKey then
+        Status.TextColor3 = Color3.fromRGB(90, 255, 130)
+        Status.Text = "✅ ¡Key correcta! Cargando script..."
+        saveKey(TextBox.Text)
+        task.wait(0.8)
+        ScreenGui:Destroy()
+        runScript()
+    else
+        Status.TextColor3 = Color3.fromRGB(255, 80, 80)
+        Status.Text = "❌ Key incorrecta. Intenta de nuevo."
+        TextBox.Text = ""
+    end
+end)
